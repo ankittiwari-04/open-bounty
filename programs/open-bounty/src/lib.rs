@@ -15,11 +15,19 @@ declare_id!("3vrdRy3zamdYvUZJ34uinMbpJ5ZS8BqxxJD2a8EzUs2H");
 pub mod open_bounty {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        crate::instructions::initialize::handle_initialize(ctx)
-    }
-
-    pub fn increment(ctx: Context<Increment>) -> Result<()> {
-        crate::instructions::increment::handle_increment(ctx)
+    pub fn initialize_config(
+        ctx: Context<InitializeConfig>,
+        attestor_pubkey: Pubkey,
+        usdc_mint: Pubkey,
+        max_bounty_amount_base_units: u64,
+        default_refund_grace_period_seconds: i64,
+    ) -> Result<()> {
+        crate::instructions::initialize_config::handle_initialize_config(
+            ctx,
+            attestor_pubkey,
+            usdc_mint,
+            max_bounty_amount_base_units,
+            default_refund_grace_period_seconds,
+        )
     }
 }
