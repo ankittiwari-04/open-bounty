@@ -2036,6 +2036,7 @@ dependencies = [
  "anchor-spl",
  "litesvm",
  "litesvm-token",
+ "solana-ed25519-program",
  "solana-instructions-sysvar",
  "solana-keypair",
  "solana-message",
