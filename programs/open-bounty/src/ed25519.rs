@@ -211,3 +211,30 @@ mod tests {
         assert!(verify_ed25519_instruction_data(&data, &pubkey, b"anything").is_err());
     }
 }
+
+/// Fetches the instruction immediately preceding the current one and
+/// confirms it is the native Ed25519 verify program. Using strict
+/// adjacency (current_index - 1), not just "somewhere earlier in the
+/// transaction", stops an attacker from placing an unrelated valid
+/// Ed25519 instruction anywhere else and pointing our checks at it.
+pub fn get_preceding_ed25519_instruction_data(
+    instructions_sysvar: &AccountInfo,
+) -> Result<Vec<u8>> {
+    let current_index = solana_instructions_sysvar::load_current_index_checked(instructions_sysvar)
+        .map_err(|_| OpenBountyError::InvalidEd25519Data)?;
+
+    require!(current_index > 0, OpenBountyError::MissingEd25519Instruction);
+
+    let preceding_index = (current_index - 1) as usize;
+    let preceding_ix =
+        solana_instructions_sysvar::load_instruction_at_checked(preceding_index, instructions_sysvar)
+            .map_err(|_| OpenBountyError::InvalidEd25519Data)?;
+
+    require_keys_eq!(
+        preceding_ix.program_id,
+        solana_sdk_ids::ed25519_program::ID,
+        OpenBountyError::MissingEd25519Instruction
+    );
+
+    Ok(preceding_ix.data)
+}

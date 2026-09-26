@@ -22,6 +22,10 @@ pub enum OpenBountyError {
     WrongAttestor,
     #[msg("Ed25519 verified message does not match the expected attestation bytes")]
     AttestationMismatch,
+    #[msg("The instruction immediately before this one is not the Ed25519 verify program")]
+    MissingEd25519Instruction,
+    #[msg("Attestation merge_timestamp is after the bounty deadline")]
+    MergeAfterDeadline,
     #[msg("Refund is not yet available")]
     RefundNotYetAvailable,
 }
