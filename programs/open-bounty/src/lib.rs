@@ -1,5 +1,6 @@
 pub mod constants;
 pub mod attestation;
+pub mod ed25519;
 pub mod error;
 pub mod instructions;
 pub mod state;
