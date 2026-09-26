@@ -51,4 +51,22 @@ pub mod open_bounty {
             deadline_unix_timestamp,
         )
     }
+
+    pub fn release_with_attestation(
+        ctx: Context<ReleaseWithAttestation>,
+        pr_number: u64,
+        commit_sha: [u8; 20],
+        github_user_id: u64,
+        amount_base_units: u64,
+        merge_timestamp: i64,
+    ) -> Result<()> {
+        crate::instructions::release_with_attestation::handle_release_with_attestation(
+            ctx,
+            pr_number,
+            commit_sha,
+            github_user_id,
+            amount_base_units,
+            merge_timestamp,
+        )
+    }
 }
