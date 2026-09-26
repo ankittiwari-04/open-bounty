@@ -69,4 +69,8 @@ pub mod open_bounty {
             merge_timestamp,
         )
     }
+
+    pub fn refund_expired(ctx: Context<RefundExpired>) -> Result<()> {
+        crate::instructions::refund_expired::handle_refund_expired(ctx)
+    }
 }

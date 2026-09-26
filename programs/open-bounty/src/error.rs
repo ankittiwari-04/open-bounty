@@ -26,6 +26,8 @@ pub enum OpenBountyError {
     MissingEd25519Instruction,
     #[msg("Attestation merge_timestamp is after the bounty deadline")]
     MergeAfterDeadline,
+    #[msg("Refund timestamp calculation overflowed")]
+    RefundTimestampOverflow,
     #[msg("Refund is not yet available")]
     RefundNotYetAvailable,
 }
