@@ -1,7 +1,7 @@
 use {
     anchor_lang::{
         prelude::Pubkey,
-        solana_program::{instruction::Instruction, system_program},
+        solana_program::{instruction::Instruction, program_pack::Pack, system_program},
         AccountDeserialize, InstructionData, ToAccountMetas,
     },
     anchor_spl::{associated_token::get_associated_token_address, token::spl_token},
@@ -125,7 +125,7 @@ fn test_create_bounty() {
             maintainer_token_account,
             escrow_token_account,
             token_program: spl_token::id(),
-            associated_token_program: spl_associated_token_account::ID,
+            associated_token_program: anchor_spl::associated_token::ID,
             system_program: system_program::ID,
         }
         .to_account_metas(None),
