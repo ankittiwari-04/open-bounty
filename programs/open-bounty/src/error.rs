@@ -30,4 +30,6 @@ pub enum OpenBountyError {
     RefundTimestampOverflow,
     #[msg("Refund is not yet available")]
     RefundNotYetAvailable,
+    #[msg("Attested amount does not equal the fixed bounty amount")]
+    AmountMismatch,
 }

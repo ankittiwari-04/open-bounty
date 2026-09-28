@@ -85,7 +85,7 @@ pub fn handle_release_with_attestation(
     require!(bounty.status == BountyStatus::Funded, OpenBountyError::NotFunded);
     require!(
         amount_base_units == bounty.amount_base_units,
-        OpenBountyError::AmountTooLarge
+        OpenBountyError::AmountMismatch
     );
     require!(
         merge_timestamp <= bounty.deadline_unix_timestamp,
