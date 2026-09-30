@@ -29,24 +29,24 @@ const merge = (ts = 1_600_000_000n) => async () => ({
 const req = { bounty, repoFullName: "owner/repo", prNumber: 99n, payoutWallet: wallet };
 
 test("builds an attestation from on-chain + GitHub facts", async () => {
-  const r = await buildAttestation(req, { getAccountData: async () => bountyBytes(), verifyPr: merge() });
+  const r = await buildAttestation(req, { githubToken: "test-token", getAccountData: async () => bountyBytes(), verifyPr: merge() });
   assert.equal(r.attestation.amountBaseUnits, 10_000_000n);
   assert.equal(r.attestation.issueNumber, 42n);
   assert.equal(r.attestation.githubUserId, 555n);
   assert.deepEqual(r.attestation.repoHash, repoHash("owner/repo"));
 });
 test("rejects missing bounty", async () => {
-  await assert.rejects(buildAttestation(req, { getAccountData: async () => null, verifyPr: merge() }));
+  await assert.rejects(buildAttestation(req, { githubToken: "test-token", getAccountData: async () => null, verifyPr: merge() }));
 });
 test("rejects bounty that is not Funded", async () => {
-  await assert.rejects(buildAttestation(req, { getAccountData: async () => bountyBytes(1), verifyPr: merge() }));
+  await assert.rejects(buildAttestation(req, { githubToken: "test-token", getAccountData: async () => bountyBytes(1), verifyPr: merge() }));
 });
 test("rejects repo that does not match the bounty", async () => {
-  await assert.rejects(buildAttestation({ ...req, repoFullName: "evil/repo" }, { getAccountData: async () => bountyBytes(), verifyPr: merge() }));
+  await assert.rejects(buildAttestation({ ...req, repoFullName: "evil/repo" }, { githubToken: "test-token", getAccountData: async () => bountyBytes(), verifyPr: merge() }));
 });
 test("rejects merge after deadline", async () => {
-  await assert.rejects(buildAttestation(req, { getAccountData: async () => bountyBytes(0, 1_500_000_000n), verifyPr: merge(1_600_000_000n) }));
+  await assert.rejects(buildAttestation(req, { githubToken: "test-token", getAccountData: async () => bountyBytes(0, 1_500_000_000n), verifyPr: merge(1_600_000_000n) }));
 });
 test("propagates GitHub verification failure", async () => {
-  await assert.rejects(buildAttestation(req, { getAccountData: async () => bountyBytes(), verifyPr: async () => { throw new Error("pr not merged"); } }));
+  await assert.rejects(buildAttestation(req, { githubToken: "test-token", getAccountData: async () => bountyBytes(), verifyPr: async () => { throw new Error("pr not merged"); } }));
 });

@@ -73,6 +73,7 @@ async function main() {
     {
       programId: PROGRAM_ID,
       payer: payer.publicKey,
+      githubToken: "unused-mocked-verify",
       attestor,
       getAccountData: async (a) => (await conn.getAccountInfo(a))?.data ?? null,
       getBoundWallet: async (id) => (id === 555n ? winner : null),
