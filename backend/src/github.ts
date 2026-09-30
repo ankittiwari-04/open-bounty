@@ -7,6 +7,8 @@ export interface VerifiedMerge {
   mergeTimestamp: bigint; // unix seconds
   repoFullName: string;
   body?: string; // PR description; candidate-discovery use ONLY, never authorization
+  /** Same-repo issues GitHub says this PR closes (authoritative). Used for discovery. */
+  closingIssues?: bigint[];
 }
 
 export interface VerifyOpts {
@@ -100,10 +102,11 @@ export async function verifyMergedPr(o: VerifyOpts): Promise<VerifiedMerge> {
   // the funded issue? Never trust "Fixes #N" text in the PR body — GitHub
   // itself may disagree (wrong branch, edited after merge, etc.).
   const closing = await fetchClosingIssues(f, o.token, owner, repo, o.prNumber);
-  const closesFundedIssue = closing.some(
-    (c) => BigInt(c.number) === o.issueNumber && c.repoFullName.toLowerCase() === o.repoFullName.toLowerCase(),
-  );
-  if (!closesFundedIssue) throw new Error("pr does not close the funded issue");
+  const sameRepoClosing = closing
+    .filter((c) => c.repoFullName.toLowerCase() === o.repoFullName.toLowerCase())
+    .map((c) => BigInt(c.number));
+  if (o.issueNumber !== undefined && !sameRepoClosing.includes(o.issueNumber))
+    throw new Error("pr does not close the funded issue");
 
   return {
     prNumber: o.prNumber,
@@ -111,5 +114,6 @@ export async function verifyMergedPr(o: VerifyOpts): Promise<VerifiedMerge> {
     githubUserId: BigInt(pr.user.id),
     mergeTimestamp: BigInt(Math.floor(ms / 1000)),
     repoFullName: base,
+    closingIssues: sameRepoClosing,
   };
 }

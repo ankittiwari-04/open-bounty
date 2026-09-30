@@ -1,6 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
 import type { VerifiedMerge } from "./github.ts";
-import { parseClosingIssues } from "./issue.ts";
 import { repoHash } from "./repo.ts";
 import type { SubmitResult } from "./submit.ts";
 
@@ -29,7 +28,7 @@ export function createMergeProcessor(d: PipelineDeps) {
     inFlight.add(key);
     try {
       const merge = await d.verifyPr(m);
-      const issues = parseClosingIssues(merge.body ?? "");
+      const issues = merge.closingIssues ?? [];
       if (issues.length === 0) {
         log(`${key}: no closing issues`);
         return [];

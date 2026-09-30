@@ -29,6 +29,7 @@ const merge = async () => ({
 const deps = (over: object = {}) => ({
   programId,
   payer: pk(10),
+  githubToken: "test-token",
   attestor: Keypair.fromSeed(filled(7, 32)),
   getAccountData: async () => bountyBytes(),
   verifyPr: merge,

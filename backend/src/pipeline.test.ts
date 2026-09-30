@@ -2,11 +2,12 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { PublicKey } from "@solana/web3.js";
 import { createMergeProcessor } from "./pipeline.ts";
+import { parseClosingIssues } from "./issue.ts";
 
 const filled = (b: number, n: number) => new Uint8Array(n).fill(b);
 const pk = (b: number) => new PublicKey(filled(b, 32));
 const merge = (body: string) => async () => ({
-  prNumber: 99n, commitSha: filled(3, 20), githubUserId: 555n, mergeTimestamp: 1n, repoFullName: "owner/repo", body,
+  prNumber: 99n, commitSha: filled(3, 20), githubUserId: 555n, mergeTimestamp: 1n, repoFullName: "owner/repo", body, closingIssues: parseClosingIssues(body),
 });
 const m = { repoFullName: "owner/repo", prNumber: 99n };
 
