@@ -12,7 +12,7 @@ pub use attestation::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("3vrdRy3zamdYvUZJ34uinMbpJ5ZS8BqxxJD2a8EzUs2H");
+declare_id!("DNLHZMdnmgxpWWYbqdNcp5xLqvyJ6zxonn27qUAveGch");
 
 #[program]
 pub mod open_bounty {

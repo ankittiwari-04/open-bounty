@@ -7,7 +7,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-open_bounty = "3vrdRy3zamdYvUZJ34uinMbpJ5ZS8BqxxJD2a8EzUs2H"
+open_bounty = "DNLHZMdnmgxpWWYbqdNcp5xLqvyJ6zxonn27qUAveGch"
 
 [provider]
 cluster = "localnet"
