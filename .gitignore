@@ -7,3 +7,7 @@ test-ledger
 .yarn
 .surfpool
 backend/node_modules
+
+*-keypair.json
+*.keypair.json
+backend/.env
