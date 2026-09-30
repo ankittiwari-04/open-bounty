@@ -9,6 +9,7 @@ import { prepareRelease } from "./release.ts";
 import { createApp } from "./server.ts";
 import { BindingStore } from "./store.ts";
 import { submitRelease } from "./submit.ts";
+import { readCookie, verifySession } from "./session.ts";
 
 const need = (k: string): string => {
   const v = process.env[k];
@@ -27,6 +28,12 @@ const attestor = loadKeypair(need("ATTESTOR_KEYPAIR_PATH"));
 const payer = loadKeypair(need("PAYER_KEYPAIR_PATH"));
 const port = Number(process.env.PORT ?? 8787);
 const devInsecureSession = process.env.DEV_INSECURE_SESSION === "1";
+const sessionSecret = process.env.SESSION_SECRET ?? "";
+const oauthCfg =
+  process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET && process.env.OAUTH_REDIRECT_URI
+    ? { clientId: process.env.GITHUB_CLIENT_ID, clientSecret: process.env.GITHUB_CLIENT_SECRET, redirectUri: process.env.OAUTH_REDIRECT_URI }
+    : null;
+if (oauthCfg && sessionSecret.length < 32) throw new Error("SESSION_SECRET must be at least 32 characters when OAuth is enabled");
 
 const conn = new Connection(rpcUrl, "confirmed");
 const log = (m: string): void => console.log(new Date().toISOString(), m);
@@ -66,8 +73,13 @@ if (devInsecureSession) log("WARNING: DEV_INSECURE_SESSION=1, trusting x-dev-git
 createApp({
   webhookSecret,
   binding,
+  oauth: oauthCfg
+    ? { ...oauthCfg, sessionSecret, secureCookies: oauthCfg.redirectUri.startsWith("https://") }
+    : undefined,
   getSessionUserId: (req) => {
-    if (!devInsecureSession) return null; // TODO: GitHub OAuth session
+    const fromCookie = verifySession(readCookie(req.headers.cookie, "ob_session"), sessionSecret, Math.floor(Date.now() / 1000));
+    if (fromCookie !== null) return fromCookie;
+    if (!devInsecureSession) return null;
     const h = req.headers["x-dev-github-id"];
     return typeof h === "string" && /^\d{1,15}$/.test(h) ? BigInt(h) : null;
   },

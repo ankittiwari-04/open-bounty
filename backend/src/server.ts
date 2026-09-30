@@ -2,6 +2,8 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import { PublicKey } from "@solana/web3.js";
 import { BindingService } from "./binding.ts";
 import { verifyGithubSignature } from "./webhook.ts";
+import { authorizeUrl, exchangeCodeForUserId, newState, statesMatch } from "./oauth.ts";
+import { createSession, readCookie } from "./session.ts";
 
 export interface AppDeps {
   webhookSecret: string;
@@ -12,6 +14,16 @@ export interface AppDeps {
   onMerged: (m: { repoFullName: string; prNumber: bigint }) => Promise<void>;
   /** Persist a verified binding. */
   saveBinding: (githubUserId: bigint, wallet: PublicKey) => Promise<void>;
+  /** Enables GET /auth/github/login and /auth/github/callback when provided. */
+  oauth?: {
+    clientId: string;
+    clientSecret: string;
+    redirectUri: string;
+    sessionSecret: string;
+    secureCookies: boolean;
+    now?: () => number;
+    fetchFn?: typeof fetch;
+  };
 }
 
 const MAX_BODY = 1_000_000;
@@ -35,6 +47,36 @@ function send(res: ServerResponse, status: number, body: unknown): void {
 export function createApp(d: AppDeps): Server {
   return createServer(async (req, res) => {
     try {
+      if (req.method === "GET" && d.oauth) {
+        const o = d.oauth;
+        const url = new URL(req.url ?? "/", "http://localhost");
+        const secure = o.secureCookies ? "; Secure" : "";
+        if (url.pathname === "/auth/github/login") {
+          const state = newState();
+          res.writeHead(302, {
+            location: authorizeUrl(o.clientId, o.redirectUri, state),
+            "set-cookie": `ob_state=${state}; HttpOnly; SameSite=Lax; Path=/auth; Max-Age=600${secure}`,
+          });
+          return void res.end();
+        }
+        if (url.pathname === "/auth/github/callback") {
+          const okState = statesMatch(readCookie(req.headers.cookie, "ob_state"), url.searchParams.get("state") ?? undefined);
+          const code = url.searchParams.get("code");
+          if (!okState || !code) return send(res, 400, { error: "bad oauth state" });
+          const uid = await exchangeCodeForUserId({
+            code, clientId: o.clientId, clientSecret: o.clientSecret, redirectUri: o.redirectUri, fetchFn: o.fetchFn,
+          });
+          const now = (o.now ?? (() => Math.floor(Date.now() / 1000)))();
+          res.writeHead(200, {
+            "content-type": "application/json",
+            "set-cookie": [
+              `ob_session=${createSession(uid, o.sessionSecret, now)}; HttpOnly; SameSite=Lax; Path=/; Max-Age=86400${secure}`,
+              `ob_state=; HttpOnly; SameSite=Lax; Path=/auth; Max-Age=0${secure}`,
+            ],
+          });
+          return void res.end(JSON.stringify({ signedIn: true }));
+        }
+      }
       if (req.method !== "POST") return send(res, 404, { error: "not found" });
       const raw = await readBody(req);
 
