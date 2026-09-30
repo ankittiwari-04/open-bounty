@@ -6,6 +6,7 @@ export interface VerifiedMerge {
   githubUserId: bigint; // PR author
   mergeTimestamp: bigint; // unix seconds
   repoFullName: string;
+  body?: string; // PR description, used to find "Fixes #N"
 }
 
 export interface VerifyOpts {
@@ -49,5 +50,6 @@ export async function verifyMergedPr(o: VerifyOpts): Promise<VerifiedMerge> {
     githubUserId: BigInt(pr.user.id),
     mergeTimestamp: BigInt(Math.floor(ms / 1000)),
     repoFullName: base,
+    body: typeof pr.body === "string" ? pr.body : "",
   };
 }
