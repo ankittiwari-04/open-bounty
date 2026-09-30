@@ -7,6 +7,7 @@ import { createMergeProcessor } from "./pipeline.ts";
 import { findReceipt } from "./pda.ts";
 import { prepareRelease } from "./release.ts";
 import { createApp } from "./server.ts";
+import { BindingStore } from "./store.ts";
 import { submitRelease } from "./submit.ts";
 
 const need = (k: string): string => {
@@ -30,8 +31,7 @@ const devInsecureSession = process.env.DEV_INSECURE_SESSION === "1";
 const conn = new Connection(rpcUrl, "confirmed");
 const log = (m: string): void => console.log(new Date().toISOString(), m);
 
-// In-memory only: bindings are lost on restart. Replace with a database before real use.
-const bindings = new Map<string, PublicKey>();
+const store = new BindingStore(process.env.DB_PATH ?? "./bindings.db");
 const binding = new BindingService();
 
 const rpc = {
@@ -54,7 +54,7 @@ const processMerge = createMergeProcessor({
         attestor,
         githubToken,
         getAccountData: async (a) => (await conn.getAccountInfo(a))?.data ?? null,
-        getBoundWallet: async (id) => bindings.get(id.toString()) ?? null,
+        getBoundWallet: async (id) => store.get(id),
       },
     );
     return submitRelease(tx, payer, findReceipt(programId, bounty), rpc as any);
@@ -71,7 +71,7 @@ createApp({
     const h = req.headers["x-dev-github-id"];
     return typeof h === "string" && /^\d{1,15}$/.test(h) ? BigInt(h) : null;
   },
-  saveBinding: async (id, wallet) => { bindings.set(id.toString(), wallet); },
+  saveBinding: async (id, wallet) => { store.save(id, wallet); },
   onMerged: async (m) => {
     // Respond to GitHub immediately; run the payout in the background.
     processMerge(m).catch((e) => log(`merge ${m.repoFullName}#${m.prNumber} failed: ${e instanceof Error ? e.message : e}`));

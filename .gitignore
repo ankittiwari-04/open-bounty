@@ -11,3 +11,6 @@ backend/node_modules
 *-keypair.json
 *.keypair.json
 backend/.env
+
+backend/*.db
+backend/*.db-journal
