@@ -22,7 +22,7 @@ const loadKeypair = (path: string): Keypair =>
 const rpcUrl = need("RPC_URL");
 const programId = new PublicKey(need("PROGRAM_ID"));
 const webhookSecret = need("WEBHOOK_SECRET");
-const githubToken = process.env.GITHUB_TOKEN;
+const githubToken = need("GITHUB_TOKEN");
 const expectedBaseRef = process.env.EXPECTED_BASE_REF;
 const attestor = loadKeypair(need("ATTESTOR_KEYPAIR_PATH"));
 const payer = loadKeypair(need("PAYER_KEYPAIR_PATH"));

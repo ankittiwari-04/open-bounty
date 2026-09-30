@@ -6,6 +6,7 @@ export interface VerifiedMerge {
   githubUserId: bigint; // PR author
   mergeTimestamp: bigint; // unix seconds
   repoFullName: string;
+  body?: string; // PR description; candidate-discovery use ONLY, never authorization
 }
 
 export interface VerifyOpts {
@@ -13,7 +14,14 @@ export interface VerifyOpts {
   token: string; // required: GraphQL needs auth
   repoFullName: string; // "owner/repo"
   prNumber: bigint;
-  issueNumber: bigint; // the funded issue; PR must formally close this one
+  /**
+   * The funded issue. When provided, the PR must formally close it
+   * (checked via GitHub's authoritative closingIssuesReferences) or this
+   * throws. Omit ONLY for cheap candidate discovery (e.g. reading `body`
+   * to guess which issues a PR might close) -- never omit this when the
+   * result will be used to authorize a payout.
+   */
+  issueNumber?: bigint;
   expectedBaseRef?: string; // e.g. "main"
 }
 
