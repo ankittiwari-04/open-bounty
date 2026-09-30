@@ -65,3 +65,11 @@ test("signed message equals the attested values", () => {
   const ed = buildReleaseTx(att(), ctx()).instructions[1]!;
   assert.equal(ed.data.length, 16 + 32 + 64 + 188);
 });
+
+test("release ix data matches the Rust golden vector", () => {
+  const d = encodeReleaseData(att());
+  assert.equal(
+    d.toString("hex"),
+    "9f7591be0cd60841630000000000000003030303030303030303030303030303030303032b02000000000000809698000000000000f1536500000000",
+  );
+});
