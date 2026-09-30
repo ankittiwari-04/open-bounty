@@ -6,28 +6,72 @@ export interface VerifiedMerge {
   githubUserId: bigint; // PR author
   mergeTimestamp: bigint; // unix seconds
   repoFullName: string;
-  body?: string; // PR description, used to find "Fixes #N"
 }
 
 export interface VerifyOpts {
   fetchFn?: typeof fetch;
-  token?: string;
+  token: string; // required: GraphQL needs auth
   repoFullName: string; // "owner/repo"
   prNumber: bigint;
+  issueNumber: bigint; // the funded issue; PR must formally close this one
   expectedBaseRef?: string; // e.g. "main"
 }
 
-/** Re-fetches the PR from GitHub and returns only what GitHub itself confirms. */
+function parseOwnerRepo(full: string): { owner: string; repo: string } {
+  const [owner, repo] = full.split("/");
+  if (!owner || !repo) throw new Error("bad repo name");
+  return { owner, repo };
+}
+
+async function fetchClosingIssues(
+  f: typeof fetch,
+  token: string,
+  owner: string,
+  repo: string,
+  prNumber: bigint,
+): Promise<{ number: number; repoFullName: string }[]> {
+  const query = `
+    query($owner: String!, $repo: String!, $pr: Int!) {
+      repository(owner: $owner, name: $repo) {
+        pullRequest(number: $pr) {
+          closingIssuesReferences(first: 50) {
+            nodes { number repository { owner { login } name } }
+          }
+        }
+      }
+    }`;
+  const res = await f("https://api.github.com/graphql", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      "User-Agent": "open-bounty-attestor",
+    },
+    body: JSON.stringify({ query, variables: { owner, repo, pr: Number(prNumber) } }),
+  });
+  if (!res.ok) throw new Error(`github graphql ${res.status}`);
+  const json: any = await res.json();
+  if (json.errors) throw new Error("github graphql error: " + JSON.stringify(json.errors));
+  const nodes = json?.data?.repository?.pullRequest?.closingIssuesReferences?.nodes ?? [];
+  return nodes.map((n: any) => ({
+    number: n.number,
+    repoFullName: `${n.repository.owner.login}/${n.repository.name}`,
+  }));
+}
+
+/** Re-fetches the PR from GitHub and confirms it formally closes `issueNumber`. */
 export async function verifyMergedPr(o: VerifyOpts): Promise<VerifiedMerge> {
   const f = o.fetchFn ?? fetch;
   if (!/^[\w.-]+\/[\w.-]+$/.test(o.repoFullName)) throw new Error("bad repo name");
+  const { owner, repo } = parseOwnerRepo(o.repoFullName);
+
   const url = `https://api.github.com/repos/${o.repoFullName}/pulls/${o.prNumber}`;
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
+    Authorization: `Bearer ${o.token}`,
     "X-GitHub-Api-Version": "2022-11-28",
     "User-Agent": "open-bounty-attestor",
   };
-  if (o.token) headers.Authorization = `Bearer ${o.token}`;
 
   const res = await f(url, { headers });
   if (!res.ok) throw new Error(`github api ${res.status}`);
@@ -44,12 +88,20 @@ export async function verifyMergedPr(o: VerifyOpts): Promise<VerifiedMerge> {
   const ms = Date.parse(pr.merged_at);
   if (!Number.isFinite(ms)) throw new Error("bad merged_at");
 
+  // Authoritative check: does GitHub's own closing-issue relation include
+  // the funded issue? Never trust "Fixes #N" text in the PR body — GitHub
+  // itself may disagree (wrong branch, edited after merge, etc.).
+  const closing = await fetchClosingIssues(f, o.token, owner, repo, o.prNumber);
+  const closesFundedIssue = closing.some(
+    (c) => BigInt(c.number) === o.issueNumber && c.repoFullName.toLowerCase() === o.repoFullName.toLowerCase(),
+  );
+  if (!closesFundedIssue) throw new Error("pr does not close the funded issue");
+
   return {
     prNumber: o.prNumber,
     commitSha: commitShaFromHex(String(pr.merge_commit_sha)),
     githubUserId: BigInt(pr.user.id),
     mergeTimestamp: BigInt(Math.floor(ms / 1000)),
     repoFullName: base,
-    body: typeof pr.body === "string" ? pr.body : "",
   };
 }

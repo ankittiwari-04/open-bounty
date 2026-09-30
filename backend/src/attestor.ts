@@ -9,7 +9,7 @@ export interface AttestorDeps {
   getAccountData: (address: PublicKey) => Promise<Uint8Array | null>;
   verifyPr?: typeof verifyMergedPr;
   fetchFn?: typeof fetch;
-  githubToken?: string;
+  githubToken: string;
 }
 
 export interface AttestRequest {
@@ -44,6 +44,7 @@ export async function buildAttestation(req: AttestRequest, d: AttestorDeps): Pro
     token: d.githubToken,
     repoFullName: req.repoFullName,
     prNumber: req.prNumber,
+    issueNumber: bountyAccount.issueNumber,
     expectedBaseRef: req.expectedBaseRef,
   });
 

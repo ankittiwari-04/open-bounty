@@ -35,9 +35,10 @@ export async function prepareRelease(req: ReleaseRequest, d: ReleaseDeps): Promi
   const verify = d.verifyPr ?? verifyMergedPr;
   const merge = await verify({
     fetchFn: d.fetchFn,
-    token: d.githubToken,
+    token: d.githubToken!,
     repoFullName: req.repoFullName,
     prNumber: req.prNumber,
+    issueNumber: b.issueNumber,
     expectedBaseRef: req.expectedBaseRef,
   });
 
