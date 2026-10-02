@@ -85,10 +85,9 @@ Everything below was produced by the real program and the real backend, includin
 | Attestor public key | [`DQstviVN…UHcPa`](https://explorer.solana.com/address/DQstviVNCyFMKRFZiuN3JroRChooeM2wDbpKheUUHcPa?cluster=devnet) |
 | Test USDC mint (6 decimals) | [`85EeiBHg…ey5F`](https://explorer.solana.com/address/85EeiBHg8K68RsMpV2Yz36K7qu7uKQh1PtRjZ61iey5F?cluster=devnet) |
 | Bounty for issue #3 (10 USDC) | [`9FuyjLaE…a1bsF`](https://explorer.solana.com/address/9FuyjLaEJeBVrfHi4BL4xLjmQBsAcD1ve8RrkADa1bsF?cluster=devnet) · [create tx](https://explorer.solana.com/tx/3ZSoaWE4xazsNumPahD2c8oXnHummXTapBZDg6qdMNbWEbAUtCMbYcGWjukHr5tSLpw2xk7TVz4NE9tzaMYavtxm?cluster=devnet) |
-| Payout triggered by merging [PR #4](https://github.com/ankittiwari-04/open-bounty/pull/4) | [`<RELEASE_TX_SIGNATURE>`](https://explorer.solana.com/tx/<RELEASE_TX_SIGNATURE>?cluster=devnet) |
+| Payout triggered by merging [PR #4](https://github.com/ankittiwari-04/open-bounty/pull/4) | [`2rW3NupDR2KugPA86qfHbRFX6Dii9iKSzXzwj5yTXxFmnZA4mhREf7P1VhpAYuLpZxvqieRPqbNGdKVRajeZLcv1`](https://explorer.solana.com/tx/2rW3NupDR2KugPA86qfHbRFX6Dii9iKSzXzwj5yTXxFmnZA4mhREf7P1VhpAYuLpZxvqieRPqbNGdKVRajeZLcv1?cluster=devnet) |
 | Earlier attested release to a fresh wallet (e2e script) | [`4N4Uzi2b…m6eH`](https://explorer.solana.com/tx/4N4Uzi2b6nJEM7i9tTx1ehZKxtmL1ANLCEipHxUFTW1tKHs3MLxUEpnTtNyJzwH67gXy8DrLDWncUkzTzuhym6eH?cluster=devnet) |
 
-Demo video: `<DEMO_VIDEO_URL>` · Live app: `<LIVE_APP_URL>`
 
 ## Security model
 
