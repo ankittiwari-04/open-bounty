@@ -3,6 +3,8 @@
 **Fund a GitHub issue with USDC. When the pull request that closes it is merged, the contributor is paid automatically.**
 No manual payout, no custodian, no trust in the maintainer's memory.
 
+**Live demo (Solana Devnet, demo data):** https://web-khaki-tau-97.vercel.app/console
+
 ![Solana](https://img.shields.io/badge/Solana-devnet-9945FF) ![Anchor](https://img.shields.io/badge/Anchor-1.2-blue) ![TypeScript](https://img.shields.io/badge/backend-TypeScript-3178C6) ![Status](https://img.shields.io/badge/status-devnet%20%7C%20unaudited-orange)
 
 ---
@@ -10,7 +12,7 @@ No manual payout, no custodian, no trust in the maintainer's memory.
 ## At a glance
 
 - **What it is:** an escrow program plus an attestor service that turns "PR merged" on GitHub into "USDC paid" on Solana.
-- **What works today:** the full loop on devnet, from funding an issue to a payout triggered by a real GitHub merge, with a public on-chain receipt.
+- **What works today:** the full loop on devnet, from funding an issue to a payout triggered by a real GitHub merge, with a public on-chain receipt. In the recorded run, PR #4 was merged at 00:46:18 UTC and the payout landed at 00:46:28 UTC, about 10 seconds later.
 - **Why it can be trusted:** strict on-chain verification of every attestation, and every byte layout cross-checked between Rust, TypeScript and an independent Python derivation.
 - **What it needs next:** a frontend, a security audit, and real users.
 

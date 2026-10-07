@@ -14,7 +14,7 @@ export default function EventLedger({ evidence, stage, selected, onPick, live }:
   return (
     <div className="card">
       <h2>Event ledger{evidence.isDemoData ? " · Demo data" : ""}</h2>
-      <p className="note">Workflow events, not on-chain state. Only Funded, Paid and Refunded are on-chain.{evidence.isDemoData ? " Timestamps were not captured in this demo run." : ""}</p>
+      <p className="note">Workflow events, not on-chain state. Only Funded, Paid and Refunded are on-chain.{evidence.isDemoData ? " Times come from GitHub and Solana; steps without a time were not recorded." : ""}</p>
       {shown.length === 0 && <p style={{ color: "var(--mu)" }}>No events yet.</p>}
       {shown.map((e, i) => {
         const { Icon, name } = SRC[e.source];
