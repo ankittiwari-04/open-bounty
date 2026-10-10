@@ -187,7 +187,7 @@ Webhook setup: add a webhook to the repo with payload URL `<your-url>/webhook/gi
 
 Target users are open-source maintainers and DAOs that want to pay for specific issues, and contributors worldwide who want predictable payment.
 
-## Fit with the judging criteria (Superteam India x Colosseum)
+## Fit with the criteria (Superteam India x Colosseum)
 
 | Criterion | How OpenBounty addresses it |
 |---|---|
