@@ -16,7 +16,7 @@ Today this runs on Solana Devnet with mock USDC. No one has to remember to send 
 - **What it is:** an escrow program plus an attestor service that turns "PR merged" on GitHub into "USDC paid" on Solana.
 - **What works today:** the full loop on devnet, from funding an issue to a payout triggered by a real GitHub merge, with a public on-chain receipt. In the recorded run, PR #4 was merged at 00:46:18 UTC and the payout landed at 00:46:28 UTC, about 10 seconds later.
 - **Why it is inspectable:** the program checks every release authorization against its own on-chain records, and every byte layout is cross-checked between Rust, TypeScript and an independent Python derivation. The attestor is still a trusted role.
-- **What it needs next:** a frontend, a security audit, and real users.
+- **What it needs next:** self-serve onboarding in the web app (creating bounties and binding wallets from the browser, which run through scripts today), a security audit, and real users.
 
 ---
 
@@ -138,6 +138,8 @@ backend/src/
   binding.ts, session.ts, oauth.ts, store.ts        wallet binding, sessions, GitHub OAuth, SQLite
   server.ts, main.ts    HTTP server and entrypoint
   devnet-*.ts           devnet setup and demo scripts
+web/                    Next.js Settlement Console (read-only, demo data from a real Devnet run)
+frontend/               Vite app that reads bounties directly from Devnet
 ```
 
 ## Run it locally
@@ -193,7 +195,7 @@ Target users are open-source maintainers and DAOs that want to pay for specific 
 
 ## Roadmap
 
-1. Frontend for creating bounties, signing in with GitHub, binding a wallet and tracking status.
+1. Self-serve onboarding in the web app: create bounties, sign in with GitHub and bind a wallet from the browser. Today those steps run through scripts, and the console is read-only.
 2. Replace the per-repo webhook with a GitHub App for one-click installs.
 3. Threshold (multi-attestor) signing and key custody in a KMS or HSM, to remove the single-key risk.
 4. Third-party security audit, then mainnet with a conservative cap.
@@ -203,6 +205,7 @@ Target users are open-source maintainers and DAOs that want to pay for specific 
 ## Status and limitations
 
 - Devnet only, test USDC, unaudited.
+- The web console is read-only and shows demo data from a real Devnet run. Bounties are created, and wallets bound, with scripts.
 - Wallet bindings are stored in SQLite on a single server; there is no replication yet.
 - Pending binding nonces are held in memory and are lost on restart (users simply request a new one).
 
