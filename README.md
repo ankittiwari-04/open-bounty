@@ -5,6 +5,8 @@ No manual payout, no custodian, no trust in the maintainer's memory.
 
 **Live demo (Solana Devnet, demo data):** https://web-khaki-tau-97.vercel.app/console
 
+**Demo video (live merge to payout on Devnet):** https://youtu.be/bJWjjPRMZhU
+
 ![Solana](https://img.shields.io/badge/Solana-devnet-9945FF) ![Anchor](https://img.shields.io/badge/Anchor-1.2-blue) ![TypeScript](https://img.shields.io/badge/backend-TypeScript-3178C6) ![Status](https://img.shields.io/badge/status-devnet%20%7C%20unaudited-orange)
 
 ---
