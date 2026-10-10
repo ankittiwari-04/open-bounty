@@ -1,7 +1,7 @@
 # OpenBounty
 
 **Fund a GitHub issue with USDC. When the pull request that closes it is merged, the contributor is paid automatically.**
-No manual payout, no custodian, no trust in the maintainer's memory.
+Today this runs on Solana Devnet with mock USDC. No one has to remember to send the payment: the money sits in a Solana program escrow, not in a person's or a company's wallet, and a trusted Devnet attestor authorizes the release (see [Trust assumptions](#trust-assumptions-stated-plainly)).
 
 **Live demo (Solana Devnet, demo data):** https://web-khaki-tau-97.vercel.app/console
 
@@ -15,7 +15,7 @@ No manual payout, no custodian, no trust in the maintainer's memory.
 
 - **What it is:** an escrow program plus an attestor service that turns "PR merged" on GitHub into "USDC paid" on Solana.
 - **What works today:** the full loop on devnet, from funding an issue to a payout triggered by a real GitHub merge, with a public on-chain receipt. In the recorded run, PR #4 was merged at 00:46:18 UTC and the payout landed at 00:46:28 UTC, about 10 seconds later.
-- **Why it can be trusted:** strict on-chain verification of every attestation, and every byte layout cross-checked between Rust, TypeScript and an independent Python derivation.
+- **Why it is inspectable:** the program checks every release authorization against its own on-chain records, and every byte layout is cross-checked between Rust, TypeScript and an independent Python derivation. The attestor is still a trusted role.
 - **What it needs next:** a frontend, a security audit, and real users.
 
 ---
@@ -35,7 +35,7 @@ OpenBounty locks USDC in an on-chain escrow tied to a specific GitHub issue. A m
 | Who | What they get |
 |---|---|
 | **Maintainer** | Fund an issue once. Funds are visible and locked on-chain. Unclaimed funds are refundable after the deadline plus a grace period. |
-| **Contributor** | Proof the money is escrowed before starting. Instant USDC payout on merge, to a wallet they proved they own. |
+| **Contributor** | Proof the money is escrowed before starting. Automatic USDC payout on merge (about 10 seconds in the recorded run), to a wallet they proved they own. |
 | **Anyone** | Every bounty, receipt and payout is public and verifiable on Solana. |
 
 ## How it works
