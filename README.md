@@ -1,6 +1,6 @@
 # OpenBounty
 
-**Fund a GitHub issue with USDC. When the pull request that closes it is merged, the contributor is paid automatically.**
+**Fund a GitHub issue with test USDC. When the pull request that closes it is merged, the contributor is paid automatically.**
 Today this runs on Solana Devnet with mock USDC. No one has to remember to send the payment: the money sits in a Solana program escrow, not in a person's or a company's wallet, and a trusted Devnet attestor authorizes the release (see [Trust assumptions](#trust-assumptions-stated-plainly)).
 
 **Live demo (Solana Devnet, demo data):** https://web-khaki-tau-97.vercel.app/console
@@ -24,7 +24,7 @@ Today this runs on Solana Devnet with mock USDC. No one has to remember to send 
 
 Open-source bounties break at the last step: **getting paid**.
 
-- Contributors do the work, then wait on a maintainer to remember, approve and send funds. Many never get paid.
+- Contributors can complete work, open a pull request, and still face delayed or uncertain payment.
 - Maintainers who want to offer bounties either pay by hand or hand money to a custodial platform.
 - Neither side can verify, in advance, that the money exists and will move when the work is merged.
 
@@ -142,6 +142,8 @@ web/                    Next.js Settlement Console (read-only, demo data from a 
 frontend/               Vite app that reads bounties directly from Devnet
 ```
 
+The Next.js `web/` console is the primary judge-facing demo. The Vite `frontend/` app is a separate Devnet data viewer and is not the primary product flow.
+
 ## Run it locally
 
 Requirements: Rust, Solana CLI (with `cargo build-sbf`), Node 22.5 or newer.
@@ -179,8 +181,8 @@ Webhook setup: add a webhook to the repo with payload URL `<your-url>/webhook/gi
 ## Why Solana, and who this is for
 
 - **Cents-level fees make small bounties viable.** A $5 fix is not worth it on a chain where the fee is a meaningful share of the payout.
-- **USDC-native settlement** means contributors get a dollar-denominated payout they can use immediately.
-- **PDAs, the Ed25519 precompile and the instructions sysvar** let the program verify an off-chain attestation without custody or a trusted payout button.
+- **USDC settlement** (test USDC on Devnet today) means contributors are paid in a dollar-denominated token instead of a volatile one.
+- **PDAs, the Ed25519 precompile, and the Instructions Sysvar** let the program verify a trusted off-chain authorization while keeping bounty funds in PDA-controlled escrow instead of relying on a maintainer to manually send payment.
 - **Onboarding.** Every contributor who claims a bounty creates and binds a Solana wallet, so the product brings open-source developers into the ecosystem as a side effect of doing their normal work.
 
 Target users are open-source maintainers and DAOs that want to pay for specific issues, and contributors worldwide who want predictable payment.
@@ -189,8 +191,8 @@ Target users are open-source maintainers and DAOs that want to pay for specific 
 
 | Criterion | How OpenBounty addresses it |
 |---|---|
-| **Ecosystem impact** | Reusable infrastructure: a pattern for turning an off-chain event (a GitHub merge) into an Ed25519-verified, replay-protected on-chain payout, with no custody and a public receipt. USDC settlement on Solana. |
-| **Product-market fit** | A defined problem (contributors and maintainers cannot trust bounty payment) and defined users (open-source maintainers and DAOs funding specific issues, and the contributors who fix them). Early usage is reported honestly in the Traction section. |
+| **Ecosystem impact** | Reusable infrastructure: a pattern for turning an off-chain GitHub merge event into an Ed25519-verified, replay-protected payout from PDA-controlled Solana escrow, with a public receipt. Test-USDC settlement on Solana Devnet. |
+| **Product-market fit** | A defined problem (contributors and maintainers cannot trust bounty payment) and defined users (open-source maintainers and DAOs funding specific issues, and the contributors who fix them). What has and has not been validated is stated in the Current validation section. |
 | **Growth potential** | Every claimed bounty creates and binds a Solana wallet for a developer who may be new to the ecosystem. Bounties live in GitHub issues, so each funded issue is visible distribution to other contributors. |
 
 ## Roadmap
@@ -209,9 +211,11 @@ Target users are open-source maintainers and DAOs that want to pay for specific 
 - Wallet bindings are stored in SQLite on a single server; there is no replication yet.
 - Pending binding nonces are held in memory and are lost on restart (users simply request a new one).
 
-## Traction
+## Current validation
 
-`<Add real numbers here: repos or maintainers contacted, pilots, funded bounties, feedback. Delete this section if there is nothing to report yet.>`
+The completed Devnet flow uses a controlled repository and test accounts. It proves the end-to-end technical path: bounty funding, GitHub merge verification, attestation, automatic payout, and on-chain receipt creation.
+
+OpenBounty has not yet completed an independent maintainer pilot. The immediate next milestone is a Devnet test with an external open-source maintainer and contributor, followed by a conservative security review before any mainnet use.
 
 ## License
 
